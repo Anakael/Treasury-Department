@@ -11,11 +11,11 @@ namespace TreasuryDepartment.Models
 		}
 
 		public DbSet<Balance> Balances { get; set; }
+		public DbSet<BlackList> BlackLists { get; set; }
 		public DbSet<Deal> Deals { get; set; }
-		public DbSet<Group> Groups { get; set; }
+		public DbSet<Friend> Friends { get; set; }
 		public DbSet<Invite> Invites { get; set; }
 		public DbSet<User> Users { get; set; }
-		public DbSet<UserGroup> UserGroups { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -34,6 +34,20 @@ namespace TreasuryDepartment.Models
 
 			});
 
+			modelBuilder.Entity<BlackList>(entity =>
+			{
+				entity.HasKey(t => new { t.SenderUserId, t.TargetUserId });
+
+				entity.HasOne(f => f.SenderUser)
+					.WithMany(su => su.OutcomeBlackLists)
+					.HasForeignKey(ug => ug.SenderUserId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(bl => bl.TargetUser)
+					.WithMany(su => su.IncomeBlackLists)
+					.HasForeignKey(ug => ug.TargetUserId);
+			});
+
 			modelBuilder.Entity<Deal>(entity =>
 			{
 				entity.HasKey(t => new { t.SenderUserId, t.TargetUserId });
@@ -48,14 +62,31 @@ namespace TreasuryDepartment.Models
 					.HasForeignKey(ug => ug.TargetUserId);
 			});
 
-			modelBuilder.Entity<Invite>(entity =>
+			modelBuilder.Entity<Friend>(entity =>
 			{
-				entity.HasKey(i => new { i.UserId, i.GroupId });
+				entity.HasKey(t => new { t.User1Id, t.User2Id });
+
+				entity.HasOne(f => f.User1)
+					.WithMany(su => su.OutcomeFriends)
+					.HasForeignKey(ug => ug.User1Id)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(f => f.User2)
+					.WithMany(su => su.IncomeFriends)
+					.HasForeignKey(ug => ug.User2Id);
 			});
 
-			modelBuilder.Entity<UserGroup>(entity =>
+			modelBuilder.Entity<Invite>(entity =>
 			{
-				entity.HasKey(t => new { t.UserId, t.GroupId });
+				entity.HasKey(i => new { i.SenderUserId, i.TargetUserId });
+				entity.HasOne(d => d.SenderUser)
+					.WithMany(su => su.SentInvites)
+					.HasForeignKey(ug => ug.SenderUserId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(d => d.TargetUser)
+					.WithMany(su => su.ReciviedInvites)
+					.HasForeignKey(ug => ug.TargetUserId);
 			});
 		}
 	}

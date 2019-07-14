@@ -8,7 +8,13 @@ namespace TreasuryDepartment.Models
 		public long Id { get; set; }
 		public string Name { get; set; }
 
-		public ICollection<UserGroup> UserGroups { get; set; } = new List<UserGroup>();
+		public ICollection<Friend> OutcomeFriends { get; set; } = new List<Friend>();
+		public ICollection<Friend> IncomeFriends { get; set; } = new List<Friend>();
+		public ICollection<BlackList> OutcomeBlackLists { get; set; } = new List<BlackList>();
+		public ICollection<BlackList> IncomeBlackLists { get; set; } = new List<BlackList>();
+
+
+		public ICollection<Invite> SentInvites { get; set; } = new HashSet<Invite>();
 		public ICollection<Invite> ReciviedInvites { get; set; } = new HashSet<Invite>();
 
 		public ICollection<Balance> OutcomeBalances { get; set; } = new HashSet<Balance>();
