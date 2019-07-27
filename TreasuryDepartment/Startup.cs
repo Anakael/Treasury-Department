@@ -36,6 +36,8 @@ namespace TreasuryDepartment
 			   options.UseSqlServer(builder.ConnectionString));
 
 			services.AddScoped<InviteService>();
+			services.AddScoped<FriendService>();
+			services.AddScoped<UserService>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 		}

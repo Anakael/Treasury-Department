@@ -9,11 +9,16 @@ namespace TreasuryDepartment.Services
 	public class InviteService
 	{
 		private readonly TreasuryDepartmentContext _context;
+		private readonly FriendService _friendService;
 
-		public InviteService(TreasuryDepartmentContext context)
+		public InviteService(TreasuryDepartmentContext context, FriendService friendService)
 		{
 			_context = context;
+			_friendService = friendService;
 		}
+
+		public async Task<Invite> Get(long senderUserId, long targetUserId) =>
+			await _context.Invites.FindAsync(senderUserId, targetUserId);
 
 		public async Task<List<Invite>> GetReciviedInvites(long targetUserId) =>
 			await (
@@ -29,21 +34,11 @@ namespace TreasuryDepartment.Services
 				select i
 			).ToListAsync();
 
-		private IQueryable<Invite> Get(long senderUserId, long targetUserId) =>
-			from i in _context.Invites.AsNoTracking()
-			where i.SenderUserId == senderUserId && i.TargetUserId == targetUserId
-			select i;
-
-		private async Task ChangeStatus(long senderUserId, long targetUserId, InviteStatus newStatus)
+		private async Task ChangeStatus(Invite invite, InviteStatus newStatus)
 		{
-			Invite invite = await Get(senderUserId, targetUserId).FirstAsync();
-
-			if (invite != null)
-			{
-				invite.Status = newStatus;
-				_context.Entry(invite).State = EntityState.Modified;
-				await _context.SaveChangesAsync();
-			}
+			invite.Status = newStatus;
+			_context.Entry(invite).State = EntityState.Modified;
+			await _context.SaveChangesAsync();
 		}
 
 		public async Task<Invite> Create(Invite invite)
@@ -53,21 +48,20 @@ namespace TreasuryDepartment.Services
 			return invite;
 		}
 
-		public async Task Accept(long senderUserId, long targetUserId) =>
-			await ChangeStatus(senderUserId, targetUserId, InviteStatus.Accepted);
-
-		public async Task Decline(long senderUserId, long targetUserId) =>
-			await ChangeStatus(senderUserId, targetUserId, InviteStatus.Declined);
-
-		public async Task Delete(long senderUserId, long targetUserId)
+		public async void Accept(Invite invite)
 		{
-			Invite invite = await Get(senderUserId, targetUserId).FirstAsync();
+			await ChangeStatus(invite, InviteStatus.Accepted);
+			await _friendService.Create(new Friend(invite.SenderUserId, invite.TargetUserId));
+		}
 
-			if (invite != null && invite.Status != InviteStatus.Created)
-			{
-				_context.Remove(invite);
-				await _context.SaveChangesAsync();
-			}
+		public async void Decline(Invite invite) =>
+			await ChangeStatus(invite, InviteStatus.Declined);
+
+
+		public async void Delete(Invite invite)
+		{
+			_context.Remove(invite);
+			await _context.SaveChangesAsync();
 		}
 	}
 }

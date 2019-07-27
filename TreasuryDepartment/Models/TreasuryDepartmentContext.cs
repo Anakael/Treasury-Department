@@ -39,12 +39,12 @@ namespace TreasuryDepartment.Models
 				entity.HasKey(t => new { t.SenderUserId, t.TargetUserId });
 
 				entity.HasOne(f => f.SenderUser)
-					.WithMany(su => su.OutcomeBlackLists)
+					.WithMany()
 					.HasForeignKey(ug => ug.SenderUserId)
 					.OnDelete(DeleteBehavior.Restrict);
 
 				entity.HasOne(bl => bl.TargetUser)
-					.WithMany(su => su.IncomeBlackLists)
+					.WithMany()
 					.HasForeignKey(ug => ug.TargetUserId);
 			});
 
@@ -53,12 +53,12 @@ namespace TreasuryDepartment.Models
 				entity.HasKey(t => new { t.SenderUserId, t.TargetUserId });
 
 				entity.HasOne(d => d.SenderUser)
-					.WithMany(su => su.SentDeals)
+					.WithMany()
 					.HasForeignKey(ug => ug.SenderUserId)
 					.OnDelete(DeleteBehavior.Restrict);
 
 				entity.HasOne(d => d.TargetUser)
-					.WithMany(su => su.ReciviedDeals)
+					.WithMany()
 					.HasForeignKey(ug => ug.TargetUserId);
 			});
 
@@ -67,25 +67,25 @@ namespace TreasuryDepartment.Models
 				entity.HasKey(t => new { t.User1Id, t.User2Id });
 
 				entity.HasOne(f => f.User1)
-					.WithMany(su => su.OutcomeFriends)
+					.WithMany()
 					.HasForeignKey(ug => ug.User1Id)
 					.OnDelete(DeleteBehavior.Restrict);
 
 				entity.HasOne(f => f.User2)
-					.WithMany(su => su.IncomeFriends)
+					.WithMany()
 					.HasForeignKey(ug => ug.User2Id);
 			});
 
 			modelBuilder.Entity<Invite>(entity =>
 			{
 				entity.HasKey(i => new { i.SenderUserId, i.TargetUserId });
-				entity.HasOne(d => d.SenderUser)
-					.WithMany(su => su.SentInvites)
+				entity.HasOne<User>()
+					.WithMany()
 					.HasForeignKey(ug => ug.SenderUserId)
 					.OnDelete(DeleteBehavior.Restrict);
 
-				entity.HasOne(d => d.TargetUser)
-					.WithMany(su => su.ReciviedInvites)
+				entity.HasOne<User>()
+					.WithMany()
 					.HasForeignKey(ug => ug.TargetUserId);
 			});
 		}
