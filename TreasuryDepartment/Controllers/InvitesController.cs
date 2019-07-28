@@ -32,7 +32,7 @@ namespace TreasuryDepartment.Controllers
 			var sentInvites = await getInvitesDelegate(user.Id);
 			return new OkObjectResult(sentInvites.Select(i => new
 			{
-				userId = getInvitesDelegate == _inviteService.GetReceivedInvites? i.TargetUserId : i.SenderUserId,
+				userId = getInvitesDelegate == _inviteService.GetReceivedInvites ? i.TargetUserId : i.SenderUserId,
 				status = i.Status
 			}));
 		}
@@ -41,12 +41,12 @@ namespace TreasuryDepartment.Controllers
 		[HttpGet("sent/{id}")]
 		public async Task<ActionResult<List<Invite>>> GetSent(long id) =>
 			await Get(id, _inviteService.GetReceivedInvites);
-		
+
 
 		[HttpGet("received/{id}")]
 		public async Task<ActionResult<List<Invite>>> GetReceived(long id) =>
 			await Get(id, _inviteService.GetSentInvites);
-		
+
 
 		[HttpPost("create/from/{fromId}/to/{toId}")]
 		public async Task<ActionResult<Invite>> Post(long fromId, long toId)
@@ -75,7 +75,7 @@ namespace TreasuryDepartment.Controllers
 			if (invite.Status != InviteStatus.Created)
 				return BadRequest();
 
-			_inviteService.Accept(invite);
+			await _inviteService.Accept(invite);
 			return NoContent();
 		}
 
@@ -91,7 +91,7 @@ namespace TreasuryDepartment.Controllers
 			if (invite.Status != InviteStatus.Created)
 				return BadRequest();
 
-			_inviteService.Decline(invite);
+			await _inviteService.Decline(invite);
 			return NoContent();
 		}
 
@@ -104,7 +104,7 @@ namespace TreasuryDepartment.Controllers
 			if (fromUser == null || toUser == null || invite == null)
 				return NotFound();
 
-			_inviteService.Delete(invite);
+			await _inviteService.Delete(invite);
 			return NoContent();
 		}
 	}

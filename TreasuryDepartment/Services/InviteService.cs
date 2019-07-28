@@ -48,17 +48,17 @@ namespace TreasuryDepartment.Services
 			return invite;
 		}
 
-		public async void Accept(Invite invite)
+		public async Task<Friend> Accept(Invite invite)
 		{
 			await ChangeStatus(invite, InviteStatus.Accepted);
-			await _friendService.Create(new Friend(invite.SenderUserId, invite.TargetUserId));
+			return await _friendService.Create(new Friend(invite.SenderUserId, invite.TargetUserId));
 		}
 
-		public async void Decline(Invite invite) =>
+		public async Task Decline(Invite invite) =>
 			await ChangeStatus(invite, InviteStatus.Declined);
 
 
-		public async void Delete(Invite invite)
+		public async Task Delete(Invite invite)
 		{
 			_context.Remove(invite);
 			await _context.SaveChangesAsync();
