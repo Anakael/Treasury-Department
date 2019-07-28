@@ -29,10 +29,10 @@ namespace TreasuryDepartment.Controllers
 			{
 				return NotFound();
 			}
-			var sentInvites = await getInvitesDelegate(user.Id);
-			return new OkObjectResult(sentInvites.Select(i => new
+			var invites = await getInvitesDelegate(user.Id);
+			return new OkObjectResult(invites.Select(i => new
 			{
-				userId = getInvitesDelegate == _inviteService.GetReceivedInvites ? i.SenderUserId : i.TargetUserId,
+				user = getInvitesDelegate == _inviteService.GetReceivedInvites ? i.SenderUser : i.TargetUser,
 				status = i.Status
 			}));
 		}
@@ -48,7 +48,7 @@ namespace TreasuryDepartment.Controllers
 			await Get(id, _inviteService.GetReceivedInvites);
 
 
-		[HttpPost("create/from/{fromId}/to/{toId}")]
+		[HttpPost("from/{fromId}/to/{toId}")]
 		public async Task<ActionResult<Invite>> Post(long fromId, long toId)
 		{
 			var fromUser = await _userService.Get(fromId);
@@ -63,7 +63,7 @@ namespace TreasuryDepartment.Controllers
 			return await _inviteService.Create(new Invite(fromUser.Id, toUser.Id));
 		}
 
-		[HttpGet("accept/from/{fromId}/to/{toId}")]
+		[HttpPost("accept/from/{fromId}/to/{toId}")]
 		public async Task<ActionResult> Accept(long fromId, long toId)
 		{
 			var fromUser = await _userService.Get(fromId);
@@ -79,7 +79,7 @@ namespace TreasuryDepartment.Controllers
 			return NoContent();
 		}
 
-		[HttpGet("decline/from/{fromId}/to/{toId}")]
+		[HttpPost("decline/from/{fromId}/to/{toId}")]
 		public async Task<ActionResult> Decline(long fromId, long toId)
 		{
 			var fromUser = await _userService.Get(fromId);

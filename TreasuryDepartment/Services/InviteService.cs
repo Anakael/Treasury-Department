@@ -25,14 +25,14 @@ namespace TreasuryDepartment.Services
 				from i in _context.Invites
 				where i.TargetUserId == targetUserId
 				select i
-			).ToListAsync();
+			).Include(i => i.SenderUser).ToListAsync();
 
 		public async Task<List<Invite>> GetSentInvites(long senderUserId) =>
 			await (
 				from i in _context.Invites
 				where i.SenderUserId == senderUserId
 				select i
-			).ToListAsync();
+			).Include(i => i.TargetUser).ToListAsync();
 
 		private async Task ChangeStatus(Invite invite, InviteStatus newStatus)
 		{
