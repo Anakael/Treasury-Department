@@ -11,6 +11,7 @@
 appsettings.Development.json
 
 # Build results
+Migrations
 
 [Dd]ebug/
 [Rr]elease/

@@ -38,12 +38,12 @@ namespace TreasuryDepartment.Models
 			{
 				entity.HasKey(t => new { t.SenderUserId, t.TargetUserId });
 
-				entity.HasOne(f => f.SenderUser)
+				entity.HasOne<User>()
 					.WithMany()
 					.HasForeignKey(ug => ug.SenderUserId)
 					.OnDelete(DeleteBehavior.Restrict);
 
-				entity.HasOne(bl => bl.TargetUser)
+				entity.HasOne<User>()
 					.WithMany()
 					.HasForeignKey(ug => ug.TargetUserId);
 			});
@@ -66,12 +66,12 @@ namespace TreasuryDepartment.Models
 			{
 				entity.HasKey(t => new { t.User1Id, t.User2Id });
 
-				entity.HasOne(f => f.User1)
+				entity.HasOne<User>()
 					.WithMany()
 					.HasForeignKey(ug => ug.User1Id)
 					.OnDelete(DeleteBehavior.Restrict);
 
-				entity.HasOne(f => f.User2)
+				entity.HasOne<User>()
 					.WithMany()
 					.HasForeignKey(ug => ug.User2Id);
 			});
