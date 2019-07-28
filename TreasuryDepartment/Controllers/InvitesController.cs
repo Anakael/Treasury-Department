@@ -32,7 +32,7 @@ namespace TreasuryDepartment.Controllers
 			var sentInvites = await getInvitesDelegate(user.Id);
 			return new OkObjectResult(sentInvites.Select(i => new
 			{
-				userId = getInvitesDelegate == _inviteService.GetReceivedInvites ? i.TargetUserId : i.SenderUserId,
+				userId = getInvitesDelegate == _inviteService.GetReceivedInvites ? i.SenderUserId : i.TargetUserId,
 				status = i.Status
 			}));
 		}
@@ -40,12 +40,12 @@ namespace TreasuryDepartment.Controllers
 
 		[HttpGet("sent/{id}")]
 		public async Task<ActionResult<List<Invite>>> GetSent(long id) =>
-			await Get(id, _inviteService.GetReceivedInvites);
+			await Get(id, _inviteService.GetSentInvites);
 
 
 		[HttpGet("received/{id}")]
 		public async Task<ActionResult<List<Invite>>> GetReceived(long id) =>
-			await Get(id, _inviteService.GetSentInvites);
+			await Get(id, _inviteService.GetReceivedInvites);
 
 
 		[HttpPost("create/from/{fromId}/to/{toId}")]
