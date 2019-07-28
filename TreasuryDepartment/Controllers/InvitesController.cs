@@ -1,3 +1,4 @@
+using System;
 using TreasuryDepartment.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,38 +20,33 @@ namespace TreasuryDepartment.Controllers
 			_inviteService = inviteService;
 			_userService = userService;
 		}
+		private delegate Task<List<Invite>> GetInvitesDelegate(long id);
 
-		[HttpGet("sent/{id}")]
-		public async Task<ActionResult<List<Invite>>> GetSent(long id)
+		private async Task<ActionResult<List<Invite>>> Get(long id, GetInvitesDelegate getInvitesDelegate)
 		{
 			var user = await _userService.Get(id);
 			if (user == null)
 			{
 				return NotFound();
 			}
-			var sentInvites = await _inviteService.GetSentInvites(user.Id);
+			var sentInvites = await getInvitesDelegate(user.Id);
 			return new OkObjectResult(sentInvites.Select(i => new
 			{
-				targetUserId = i.TargetUserId,
+				userId = getInvitesDelegate == _inviteService.GetReceivedInvites? i.TargetUserId : i.SenderUserId,
 				status = i.Status
 			}));
 		}
 
+
+		[HttpGet("sent/{id}")]
+		public async Task<ActionResult<List<Invite>>> GetSent(long id) =>
+			await Get(id, _inviteService.GetReceivedInvites);
+		
+
 		[HttpGet("received/{id}")]
-		public async Task<ActionResult<List<Invite>>> GetReceived(long id)
-		{
-			var user = await _userService.Get(id);
-			if (user == null)
-			{
-				return NotFound();
-			}
-			var reciviedInvites = await _inviteService.GetReciviedInvites(user.Id);
-			return new OkObjectResult(reciviedInvites.Select(i => new
-			{
-				senderUserId = i.SenderUserId,
-				status = i.Status
-			}));
-		}
+		public async Task<ActionResult<List<Invite>>> GetReceived(long id) =>
+			await Get(id, _inviteService.GetSentInvites);
+		
 
 		[HttpPost("create/from/{fromId}/to/{toId}")]
 		public async Task<ActionResult<Invite>> Post(long fromId, long toId)

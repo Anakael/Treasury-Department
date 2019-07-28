@@ -20,7 +20,7 @@ namespace TreasuryDepartment.Services
 		public async Task<Invite> Get(long senderUserId, long targetUserId) =>
 			await _context.Invites.FindAsync(senderUserId, targetUserId);
 
-		public async Task<List<Invite>> GetReciviedInvites(long targetUserId) =>
+		public async Task<List<Invite>> GetReceivedInvites(long targetUserId) =>
 			await (
 				from i in _context.Invites
 				where i.TargetUserId == targetUserId
