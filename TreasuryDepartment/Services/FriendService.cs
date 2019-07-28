@@ -16,10 +16,11 @@ namespace TreasuryDepartment.Services
 			_context = context;
 		}
 
-		public async Task Create(Friend friend)
+		public async Task<Friend> Create(Friend friend)
 		{
 			_context.Friends.Add(friend);
 			await _context.SaveChangesAsync();
+			return friend;
 		}
 
 		public async void Delete(Friend friend)
