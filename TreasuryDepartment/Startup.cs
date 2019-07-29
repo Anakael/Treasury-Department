@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TreasuryDepartment.Models;
+using TreasuryDepartment.Services;
 
 namespace TreasuryDepartment
 {
@@ -33,6 +34,10 @@ namespace TreasuryDepartment
 
 			services.AddDbContext<TreasuryDepartmentContext>(options =>
 			   options.UseSqlServer(builder.ConnectionString));
+
+			services.AddScoped<InviteService>();
+			services.AddScoped<FriendService>();
+			services.AddScoped<UserService>();
 
 			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 		}

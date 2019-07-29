@@ -1,5 +1,4 @@
 using System;
-using Microsoft.EntityFrameworkCore;
 
 namespace TreasuryDepartment.Models
 {
@@ -19,6 +18,6 @@ namespace TreasuryDepartment.Models
 		public decimal Sum { get; set; }
 		public DateTime CreatedDate { get; set; }
 		public DateTime LastStatusChangeDate { get; set; }
-		public DealStatus Status { get; set; }
+		public DealStatus Status { get; set; } = DealStatus.Pending;
 	}
 }
