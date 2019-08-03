@@ -1,16 +1,11 @@
 namespace TreasuryDepartment.Models
 {
-    public class Friend
+    public class Friend : Offer
     {
-        public long User1Id { get; set; }
-        public User User1 { get; set; }
-        public long User2Id { get; set; }
-        public User User2 { get; set; }
-
-        public Friend(long user1Id, long user2Id)
+        public Friend(long senderUserId, long targetUserId)
         {
-            User1Id = user1Id < user2Id ? user1Id : user2Id;
-            User2Id = user2Id > user1Id ? user2Id : user1Id;
+            SenderUserId = targetUserId < senderUserId ? targetUserId : senderUserId;
+            TargetUserId = senderUserId > targetUserId ? senderUserId : targetUserId;
         }
     }
 }
