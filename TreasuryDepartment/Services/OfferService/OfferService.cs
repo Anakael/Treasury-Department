@@ -8,12 +8,10 @@ namespace TreasuryDepartment.Services.OfferService
         where TClassname : Offer
     {
         private readonly OfferCrudService<TClassname> _offerCrudService;
-        private readonly FriendService _friendService;
 
-        public OfferService(OfferCrudService<TClassname> offerService, FriendService friendService)
+        public OfferService(OfferCrudService<TClassname> offerService)
         {
             _offerCrudService = offerService;
-            _friendService = friendService;
         }
 
         public async Task<Balance> Accept(Deal offer)
