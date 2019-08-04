@@ -17,21 +17,20 @@ namespace TreasuryDepartment.Controllers
             _userService = service;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         public async Task<ActionResult<User>> Get(long id)
         {
             var user = await _userService.Get(id);
             if (user == null)
                 NotFound();
 
-            return user;
+            return user; // TODO: Add balances
         }
 
         [HttpPost]
         public async Task<ActionResult<User>> Post(User user)
         {
-            await _userService.Create(user);
-            return CreatedAtAction(nameof(Get), new {Id = user.Id}, user);
+            return CreatedAtAction(nameof(Get), new {Id = user.Id}, await _userService.Create(user));
         }
     }
 }
