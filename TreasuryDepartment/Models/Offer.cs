@@ -3,13 +3,20 @@ using TreasuryDepartment.Models.RequestModels;
 
 namespace TreasuryDepartment.Models
 {
-    public class Offer : RequestOffer
+    public class Offer : RequestUsersOffer
     {
         public User SenderUser { get; set; }
         public User TargetUser { get; set; }
+        public Status Status { get; set; } = Status.Pending;
 
         protected Offer()
         {
+        }
+
+        public Offer(RequestUsersOffer offer)
+        {
+            SenderUserId = offer.SenderUserId;
+            TargetUserId = offer.TargetUserId;
         }
 
         protected Offer(Offer other)

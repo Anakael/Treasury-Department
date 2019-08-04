@@ -13,7 +13,7 @@ namespace TreasuryDepartment.Models
         public DbSet<Balance> Balances { get; set; }
         public DbSet<BlackList> BlackLists { get; set; }
         public DbSet<Deal> Deals { get; set; }
-        public DbSet<Friend> Friends { get; set; }
+        public DbSet<FriendInvite> Friends { get; set; }
         public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -60,7 +60,7 @@ namespace TreasuryDepartment.Models
                     .HasForeignKey(ug => ug.TargetUserId);
             });
 
-            modelBuilder.Entity<Friend>(entity =>
+            modelBuilder.Entity<FriendInvite>(entity =>
             {
                 entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});
 

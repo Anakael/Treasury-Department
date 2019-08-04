@@ -15,10 +15,10 @@ namespace TreasuryDepartment.Controllers
     public class FriendsController : Controller
     {
         private readonly UserService _userService;
-        private readonly OfferCrudService<Friend> _friendCrudService;
+        private readonly OfferCrudService<FriendInvite> _friendCrudService;
         private readonly FriendService _friendService;
 
-        public FriendsController(UserService userService, OfferCrudService<Friend> friendCrudService,
+        public FriendsController(UserService userService, OfferCrudService<FriendInvite> friendCrudService,
             FriendService friendService)
         {
             _userService = userService;
@@ -26,7 +26,7 @@ namespace TreasuryDepartment.Controllers
             _friendService = friendService;
         }
 
-        [HttpGet("[action]")]
+        [HttpGet]
         public async Task<ActionResult<List<User>>> Get(long id)
         {
             var user = await _userService.Get(id);
@@ -38,10 +38,10 @@ namespace TreasuryDepartment.Controllers
         }
 
 
-        private delegate Task<List<Friend>> GetInvitesDelegate(long id);
+        private delegate Task<List<FriendInvite>> GetInvitesDelegate(long id);
 
 
-        private async Task<ActionResult<List<Friend>>> Get(long id, GetInvitesDelegate getInvitesDelegate)
+        private async Task<ActionResult<List<FriendInvite>>> GetByType(long id, GetInvitesDelegate getInvitesDelegate)
         {
             var user = await _userService.Get(id);
             if (user == null)
@@ -57,17 +57,17 @@ namespace TreasuryDepartment.Controllers
 
 
         [HttpGet("[action]")]
-        public async Task<ActionResult<List<Friend>>> GetSent(long id) =>
-            await Get(id, _friendCrudService.GetSentOffers);
+        public async Task<ActionResult<List<FriendInvite>>> GetSent(long id) =>
+            await GetByType(id, _friendCrudService.GetSentOffers);
 
 
         [HttpGet("[action]")]
-        public async Task<ActionResult<List<Friend>>> GetReceived(long id) =>
-            await Get(id, _friendCrudService.GetReceivedOffers);
+        public async Task<ActionResult<List<FriendInvite>>> GetReceived(long id) =>
+            await GetByType(id, _friendCrudService.GetReceivedOffers);
 
 
         [HttpPost]
-        public async Task<ActionResult<Friend>> Post([FromQuery] RequestUsersOffer offer)
+        public async Task<ActionResult<FriendInvite>> Post([FromQuery] RequestUsersOffer offer)
         {
             var fromUser = await _userService.Get(offer.SenderUserId);
             if (fromUser == null)
@@ -76,7 +76,7 @@ namespace TreasuryDepartment.Controllers
             if (toUser == null)
                 return NotFound();
 
-            var friends = new Friend(offer.SenderUserId, offer.TargetUserId);
+            var friends = new FriendInvite(offer.SenderUserId, offer.TargetUserId);
             var alreadyFriends = await _friendCrudService.Get(friends);
             if (alreadyFriends != null)
                 return BadRequest();
@@ -89,15 +89,10 @@ namespace TreasuryDepartment.Controllers
 
         private delegate Task ChangeStatusDelegate<in T>(T invite);
 
-        private async Task<ActionResult> Change(Offer offer, ChangeStatusDelegate<Friend> changeStatusDelegate)
+        private async Task<ActionResult> Change(RequestUsersOffer usersOffer,
+            ChangeStatusDelegate<FriendInvite> changeStatusDelegate)
         {
-            var fromUser = await _userService.Get(offer.TargetUserId);
-            if (fromUser == null)
-                return NotFound();
-            var toUser = await _userService.Get(offer.TargetUserId);
-            if (toUser == null)
-                return NotFound();
-            var invite = await _friendCrudService.Get(offer);
+            var invite = await _friendCrudService.Get(usersOffer);
             if (invite == null)
                 return NotFound();
 
@@ -109,30 +104,15 @@ namespace TreasuryDepartment.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer offer)
-        {
-            var friendsOffer = await _friendCrudService.Get(offer);
-            if (friendsOffer == null)
-                return NotFound();
-            return await Change(friendsOffer, _friendCrudService.Accept);
-        }
+        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer offer) =>
+            await Change(offer, _friendCrudService.Accept);
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer offer)
-        {
-            var friendsOffer = await _friendCrudService.Get(offer);
-            if (friendsOffer == null)
-                return NotFound();
-            return await Change(friendsOffer, _friendCrudService.Decline);
-        }
+        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer offer) =>
+            await Change(offer, _friendCrudService.Decline);
 
         [HttpDelete]
-        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer offer)
-        {
-            var friendsOffer = await _friendCrudService.Get(offer);
-            if (friendsOffer == null)
-                return NotFound();
-            return await Change(friendsOffer, _friendCrudService.Delete);
-        }
+        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer offer) =>
+            await Change(offer, _friendCrudService.Delete);
     }
 }
