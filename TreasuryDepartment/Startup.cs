@@ -14,49 +14,52 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Services;
+using TreasuryDepartment.Services.OfferService;
 
 namespace TreasuryDepartment
 {
-	public class Startup
-	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+    public class Startup
+    {
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
-		public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to add services to the container.
-		public void ConfigureServices(IServiceCollection services)
-		{
-			var builder = new SqlConnectionStringBuilder(
-				Configuration.GetConnectionString("TreasuryDepartment"));
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            var builder = new SqlConnectionStringBuilder(
+                Configuration.GetConnectionString("TreasuryDepartment"));
 
-			services.AddDbContext<TreasuryDepartmentContext>(options =>
-			   options.UseSqlServer(builder.ConnectionString));
+            services.AddDbContext<TreasuryDepartmentContext>(options =>
+                options.UseSqlServer(builder.ConnectionString));
 
-			services.AddScoped<InviteService>();
-			services.AddScoped<FriendService>();
-			services.AddScoped<UserService>();
+            services.AddScoped<OfferCrudService<FriendInvite>>();
+            services.AddScoped<OfferCrudService<Deal>>();
+            services.AddScoped<OfferCrudService<Balance>>();
+            services.AddScoped<FriendService>();
+            services.AddScoped<UserService>();
 
-			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-		}
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+        }
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-		{
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				app.UseHsts();
-			}
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
 
-			app.UseHttpsRedirection();
-			app.UseMvc();
-		}
-	}
+            app.UseHttpsRedirection();
+            app.UseMvc();
+        }
+    }
 }

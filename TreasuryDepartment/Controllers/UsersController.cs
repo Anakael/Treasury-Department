@@ -1,46 +1,36 @@
-﻿using TreasuryDepartment.Services;
+﻿using System;
+using TreasuryDepartment.Services;
 using System.Threading.Tasks;
 using TreasuryDepartment.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TreasuryDepartment.Controllers
 {
-	[Route("api/[controller]")]
-	[ApiController]
-	public class UsersController : ControllerBase
-	{
-		private readonly UserService _userService;
-		public UsersController(UserService service)
-		{
-			_userService = service;
-		}
+    [Route("api/[controller]")]
+    [ApiController]
+    public class UsersController : ControllerBase
+    {
+        private readonly UserService _userService;
 
-		[HttpGet("{id}")]
-		public async Task<ActionResult<User>> Get(long id)
-		{
-			var user = await _userService.Get(id);
-			if (user == null)
-			{
-				return NotFound();
-			}
-			return user;
-		}
+        public UsersController(UserService service)
+        {
+            _userService = service;
+        }
 
-		[HttpPost]
-		public async Task<ActionResult<User>> Post(User user)
-		{
-			await _userService.Create(user);
-			return CreatedAtAction(nameof(Get), new { Id = user.Id }, user);
-		}
+        [HttpGet]
+        public async Task<ActionResult<User>> Get(long id)
+        {
+            var user = await _userService.Get(id);
+            if (user == null)
+                NotFound();
 
-		[HttpPut("{id}")]
-		public void Put(long id, string value)
-		{
-		}
+            return user; // TODO: Add balances
+        }
 
-		[HttpDelete("{id}")]
-		public void Delete(long id)
-		{
-		}
-	}
+        [HttpPost]
+        public async Task<ActionResult<User>> Post(User user)
+        {
+            return CreatedAtAction(nameof(Get), new {Id = user.Id}, await _userService.Create(user));
+        }
+    }
 }
