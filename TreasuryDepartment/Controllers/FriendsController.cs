@@ -26,6 +26,11 @@ namespace TreasuryDepartment.Controllers
             _friendService = friendService;
         }
 
+        /// <summary>
+        /// Retrieve friends list
+        /// </summary>
+        /// <param name="id">User's ID</param>
+        /// <returns>Friends list</returns>
         [HttpGet]
         public async Task<ActionResult<List<User>>> Get(long id)
         {
@@ -34,7 +39,7 @@ namespace TreasuryDepartment.Controllers
             if (user == null)
                 return NotFound();
 
-            return await _friendService.GetFriends(user.Id);
+            return await _friendService.GetFriends(user.Id); //TODO: Fix bug with wrong status
         }
 
 
@@ -65,7 +70,11 @@ namespace TreasuryDepartment.Controllers
         public async Task<ActionResult<List<FriendInvite>>> GetReceived(long id) =>
             await GetByType(id, _friendCrudService.GetReceivedOffers);
 
-
+        /// <summary>
+        /// Create friend's invite
+        /// </summary>
+        /// <param name="offer"></param>
+        /// <returns>New friend's invite</returns>
         [HttpPost]
         public async Task<ActionResult<FriendInvite>> Post([FromQuery] RequestUsersOffer offer)
         {
@@ -96,9 +105,6 @@ namespace TreasuryDepartment.Controllers
             if (invite == null)
                 return NotFound();
 
-            if (invite.Status != Status.Pending)
-                return BadRequest();
-
             await changeStatusDelegate(invite);
             return NoContent();
         }
@@ -113,6 +119,6 @@ namespace TreasuryDepartment.Controllers
 
         [HttpDelete]
         public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _friendCrudService.Delete);
+            await Change(offer, _friendCrudService.Delete); // TODO: Restrict for target
     }
 }

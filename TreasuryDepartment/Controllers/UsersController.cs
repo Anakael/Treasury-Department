@@ -28,7 +28,7 @@ namespace TreasuryDepartment.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> Post(User user)
+        public async Task<ActionResult<User>> Post(User user) //TODO: Replace User with UserRequestModel
         {
             return CreatedAtAction(nameof(Get), new {Id = user.Id}, await _userService.Create(user));
         }
