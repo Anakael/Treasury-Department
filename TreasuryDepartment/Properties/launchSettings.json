@@ -3,8 +3,8 @@
   "profiles": {
     "TreasuryDepartment": {
       "commandName": "Project",
-      "launchBrowser": false,
-      "launchUrl": "api/users/Get?id=1",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
       "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
