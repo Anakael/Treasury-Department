@@ -17,7 +17,6 @@ namespace TreasuryDepartment.Controllers
         private readonly UserService _userService;
         private readonly OfferCrudService<Deal> _dealsCrudService;
         private readonly OfferCrudService<FriendInvite> _friendsCrudService;
-        private readonly FriendService _friendService;
 
         public DealsController(UserService userService, OfferCrudService<Deal> dealsCrudService,
             OfferCrudService<FriendInvite> friendsCrudService,
@@ -26,7 +25,6 @@ namespace TreasuryDepartment.Controllers
             _userService = userService;
             _dealsCrudService = dealsCrudService;
             _friendsCrudService = friendsCrudService;
-            _friendService = friendService;
         }
 
         [HttpGet]
