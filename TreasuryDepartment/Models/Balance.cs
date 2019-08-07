@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+using TreasuryDepartment.Models.RequestModels;
 
 namespace TreasuryDepartment.Models
 {
-    public class Balance : Offer
+    public class Balance : UsersOffer
     {
         public decimal Sum { get; set; }
 
@@ -10,8 +10,14 @@ namespace TreasuryDepartment.Models
         {
         }
 
-        public Balance(Offer offer) : base(offer)
+
+        public Balance(UsersOffer offer, decimal sum)
         {
+            SenderUserId = offer.SenderUserId;
+            SenderUser = offer.SenderUser;
+            TargetUserId = offer.TargetUserId;
+            TargetUser = offer.TargetUser;
+            Sum = sum;
         }
     }
 }

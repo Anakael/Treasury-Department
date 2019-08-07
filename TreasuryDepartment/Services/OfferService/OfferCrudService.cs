@@ -54,23 +54,6 @@ namespace TreasuryDepartment.Services.OfferService
         public async Task Accept(TClassname offer) =>
             await ChangeStatus(offer, Status.Accepted);
 
-        public async Task<Balance> Accept(Deal offer)
-        {
-            await Accept(offer as TClassname);
-            var senderBalance = new Balance(offer);
-            senderBalance = await Get(senderBalance) as Balance ??
-                            await Create(senderBalance as TClassname) as Balance;
-            senderBalance.Sum -= offer.Sum;
-            Offer reverseOffer = offer;
-            long tmpId = reverseOffer.TargetUserId;
-            reverseOffer.TargetUserId = reverseOffer.SenderUserId;
-            reverseOffer.SenderUserId = tmpId;
-            var targetBalance = new Balance(offer);
-            targetBalance = await Get(targetBalance) as Balance ??
-                            await Create(targetBalance as TClassname) as Balance;
-            targetBalance.Sum += offer.Sum;
-            return senderBalance;
-        }
 
         public async Task Decline(TClassname offer) =>
             await ChangeStatus(offer, Status.Declined);

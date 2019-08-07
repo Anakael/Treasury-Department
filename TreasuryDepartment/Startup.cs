@@ -39,8 +39,8 @@ namespace TreasuryDepartment
 
             services.AddScoped<OfferCrudService<FriendInvite>>();
             services.AddScoped<OfferCrudService<Deal>>();
-            services.AddScoped<OfferCrudService<Balance>>();
             services.AddScoped<FriendService>();
+            services.AddScoped<DealsService>();
             services.AddScoped<UserService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

@@ -1,29 +1,28 @@
-using TreasuryDepartment.Models.Enums;
 using TreasuryDepartment.Models.RequestModels;
 
 namespace TreasuryDepartment.Models
 {
-    public class Offer : UsersOffer
+    public class UsersOffer : RequestUsersOffer
     {
-        public Status Status { get; set; } = Status.Pending;
+        public User SenderUser { get; set; }
+        public User TargetUser { get; set; }
 
-        protected Offer()
+        public UsersOffer()
         {
         }
 
-        public Offer(RequestUsersOffer offer)
+        public UsersOffer(RequestUsersOffer offer)
         {
             SenderUserId = offer.SenderUserId;
             TargetUserId = offer.TargetUserId;
         }
 
-        public Offer(Offer other)
+        protected UsersOffer(Offer other)
         {
             SenderUserId = other.SenderUserId;
             SenderUser = other.SenderUser;
             TargetUserId = other.TargetUserId;
             SenderUser = other.SenderUser;
-            Status = other.Status;
         }
     }
 }

@@ -1,6 +1,4 @@
 using System;
-using TreasuryDepartment.Models.Enums;
-using TreasuryDepartment.Models.RequestModels;
 
 namespace TreasuryDepartment.Models
 {

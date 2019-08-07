@@ -46,6 +46,20 @@ namespace TreasuryDepartment.Models
                     .HasForeignKey(ug => ug.TargetUserId);
             });
 
+            modelBuilder.Entity<Balance>(entity =>
+            {
+                entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});
+
+                entity.HasOne(d => d.SenderUser)
+                    .WithMany()
+                    .HasForeignKey(ug => ug.SenderUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(d => d.TargetUser)
+                    .WithMany()
+                    .HasForeignKey(ug => ug.TargetUserId);
+            });
+
             modelBuilder.Entity<Deal>(entity =>
             {
                 entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});

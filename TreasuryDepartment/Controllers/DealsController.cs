@@ -16,15 +16,16 @@ namespace TreasuryDepartment.Controllers
     {
         private readonly UserService _userService;
         private readonly OfferCrudService<Deal> _dealsCrudService;
+        private readonly DealsService _dealsService;
         private readonly OfferCrudService<FriendInvite> _friendsCrudService;
 
         public DealsController(UserService userService, OfferCrudService<Deal> dealsCrudService,
-            OfferCrudService<FriendInvite> friendsCrudService,
-            FriendService friendService)
+            OfferCrudService<FriendInvite> friendsCrudService, DealsService dealsService)
         {
             _userService = userService;
             _dealsCrudService = dealsCrudService;
             _friendsCrudService = friendsCrudService;
+            _dealsService = dealsService;
         }
 
         [HttpGet]
@@ -96,7 +97,7 @@ namespace TreasuryDepartment.Controllers
             if (alreadyFriends == null)
                 return Forbid();
 
-            var deal = await _dealsCrudService.Get(new Offer(usersOffer));
+            var deal = await _dealsCrudService.Get(usersOffer);
 
             if (deal.Status != Status.Pending)
                 return BadRequest();
@@ -107,7 +108,7 @@ namespace TreasuryDepartment.Controllers
 
         [HttpPost("[action]")]
         public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _dealsCrudService.Accept);
+            await Change(offer, _dealsService.Accept);
 
         [HttpPost("[action]")]
         public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer offer) =>
