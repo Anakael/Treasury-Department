@@ -21,7 +21,12 @@ namespace TreasuryDepartment.Services.OfferService
         }
 
         public async Task<TClassname> Get(RequestUsersOffer requestUsersOffer) =>
-            await _dbSet.FindAsync(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
+            await _dbSet
+                .Include(classname => classname.SenderUser)
+                .Include(classname => classname.TargetUser)
+                .SingleOrDefaultAsync(item =>
+                    item.SenderUserId == requestUsersOffer.SenderUserId &&
+                    item.TargetUserId == requestUsersOffer.TargetUserId);
 
         public async Task<List<TClassname>> GetReceivedOffers(long targetUserId) =>
             await (

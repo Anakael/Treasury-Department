@@ -6,5 +6,17 @@ namespace TreasuryDepartment.Models
     {
         public User SenderUser { get; set; }
         public User TargetUser { get; set; }
+
+        protected UsersOffer()
+        {
+        }
+
+        public UsersOffer(UsersOffer other)
+        {
+            SenderUserId = other.SenderUserId;
+            SenderUser = other.SenderUser;
+            TargetUserId = other.TargetUserId;
+            TargetUser = other.TargetUser;
+        }
     }
 }

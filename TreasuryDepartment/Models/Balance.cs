@@ -9,12 +9,8 @@ namespace TreasuryDepartment.Models
         }
 
 
-        public Balance(UsersOffer offer, decimal sum)
+        public Balance(UsersOffer offer, decimal sum) : base(offer)
         {
-            SenderUserId = offer.SenderUserId;
-            SenderUser = offer.SenderUser;
-            TargetUserId = offer.TargetUserId;
-            TargetUser = offer.TargetUser;
             Sum = sum;
         }
     }

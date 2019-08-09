@@ -17,12 +17,8 @@ namespace TreasuryDepartment.Models
             TargetUserId = offer.TargetUserId;
         }
 
-        public Offer(Offer other)
+        public Offer(Offer other) : base(other)
         {
-            SenderUserId = other.SenderUserId;
-            SenderUser = other.SenderUser;
-            TargetUserId = other.TargetUserId;
-            SenderUser = other.SenderUser;
             Status = other.Status;
         }
     }
