@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-
 namespace TreasuryDepartment.Models
 {
     public class User
     {
         /// <summary>
-        /// User's ID
+        /// ID
         /// </summary>
         public long Id { get; set; }
 

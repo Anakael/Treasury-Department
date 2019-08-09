@@ -8,7 +8,7 @@ namespace TreasuryDepartment.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime LastStatusChangeDate { get; set; } = DateTime.Now;
 
-        public Deal()
+        protected Deal()
         {
         }
 

@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Models.RequestModels;
-using System.Threading.Tasks;
 using TreasuryDepartment.Services;
 using TreasuryDepartment.Services.OfferService;
-using Microsoft.AspNetCore.Mvc;
-using TreasuryDepartment.Models.Enums;
 
 namespace TreasuryDepartment.Controllers
 {
@@ -76,32 +75,34 @@ namespace TreasuryDepartment.Controllers
         /// <param name="offer"></param>
         /// <returns>New friend's invite</returns>
         [HttpPost]
-        public async Task<ActionResult<FriendInvite>> Post([FromQuery] RequestUsersOffer offer)
+        public async Task<ActionResult<FriendInvite>> Post([FromQuery] RequestUsersOffer requestUsersOffer)
         {
-            var fromUser = await _userService.Get(offer.SenderUserId);
+            var fromUser = await _userService.Get(requestUsersOffer.SenderUserId);
             if (fromUser == null)
                 return NotFound();
-            var toUser = await _userService.Get(offer.TargetUserId);
+            var toUser = await _userService.Get(requestUsersOffer.TargetUserId);
             if (toUser == null)
                 return NotFound();
 
-            var friends = new FriendInvite(offer.SenderUserId, offer.TargetUserId);
+            var friends = new FriendInvite(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
             var alreadyFriends = await _friendCrudService.Get(friends);
             if (alreadyFriends != null)
                 return BadRequest();
 
             await _friendCrudService.Create(friends);
-            var outputUser = friends.TargetUserId == offer.TargetUserId ? friends.TargetUser : friends.SenderUser;
+            var outputUser = friends.TargetUserId == requestUsersOffer.TargetUserId
+                ? friends.TargetUser
+                : friends.SenderUser;
             return CreatedAtAction(nameof(UsersController.Get), new {id = outputUser.Id}, outputUser
             );
         }
 
         private delegate Task ChangeStatusDelegate<in T>(T invite);
 
-        private async Task<ActionResult> Change(RequestUsersOffer usersOffer,
+        private async Task<ActionResult> Change(RequestUsersOffer requestUsersOffer,
             ChangeStatusDelegate<FriendInvite> changeStatusDelegate)
         {
-            var invite = await _friendCrudService.Get(usersOffer);
+            var invite = await _friendCrudService.Get(requestUsersOffer);
             if (invite == null)
                 return NotFound();
 
@@ -110,15 +111,15 @@ namespace TreasuryDepartment.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _friendCrudService.Accept);
+        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _friendCrudService.Accept);
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _friendCrudService.Decline);
+        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _friendCrudService.Decline);
 
         [HttpDelete]
-        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _friendCrudService.Delete); // TODO: Restrict for target
+        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _friendCrudService.Delete); // TODO: Restrict for target
     }
 }

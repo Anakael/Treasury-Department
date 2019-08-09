@@ -1,12 +1,10 @@
-using TreasuryDepartment.Models.RequestModels;
-
 namespace TreasuryDepartment.Models
 {
     public class Balance : UsersOffer
     {
         public decimal Sum { get; set; }
 
-        public Balance()
+        protected Balance()
         {
         }
 

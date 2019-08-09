@@ -16,8 +16,8 @@ namespace TreasuryDepartment.Services
             _dealsService = dealsService;
         }
 
-        private async Task<Balance> Get(RequestUsersOffer offer) =>
-            await _context.Balances.FindAsync(offer.SenderUserId, offer.TargetUserId);
+        private async Task<Balance> Get(RequestUsersOffer requestUsersOffer) =>
+            await _context.Balances.FindAsync(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
 
         private async Task<Balance> Create(Balance balance)
         {
@@ -26,17 +26,17 @@ namespace TreasuryDepartment.Services
             return balance;
         }
 
-        public async Task Accept(Deal offer)
+        public async Task Accept(Deal deal)
         {
-            await _dealsService.Accept(offer);
-            var senderBalance = new Balance(offer, -offer.Sum);
+            await _dealsService.Accept(deal);
+            var senderBalance = new Balance(deal, -deal.Sum);
             senderBalance = await Get(senderBalance) ??
                             await Create(senderBalance);
-            var reverseOffer = new Offer(offer);
+            var reverseOffer = new Offer(deal);
             var tmpId = reverseOffer.TargetUserId;
             reverseOffer.TargetUserId = reverseOffer.SenderUserId;
             reverseOffer.SenderUserId = tmpId;
-            var targetBalance = new Balance(reverseOffer, offer.Sum);
+            var targetBalance = new Balance(reverseOffer, deal.Sum);
             targetBalance = await Get(targetBalance) ??
                             await Create(targetBalance);
         }

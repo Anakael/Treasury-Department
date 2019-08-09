@@ -20,8 +20,8 @@ namespace TreasuryDepartment.Services.OfferService
             _dbSet = _context.Set<TClassname>();
         }
 
-        public async Task<TClassname> Get(RequestUsersOffer offer) =>
-            await _dbSet.FindAsync(offer.SenderUserId, offer.TargetUserId);
+        public async Task<TClassname> Get(RequestUsersOffer requestUsersOffer) =>
+            await _dbSet.FindAsync(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
 
         public async Task<List<TClassname>> GetReceivedOffers(long targetUserId) =>
             await (
