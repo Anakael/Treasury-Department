@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TreasuryDepartment.Models;
+using TreasuryDepartment.Models.Enums;
 
 namespace TreasuryDepartment.Services
 {
@@ -18,7 +19,7 @@ namespace TreasuryDepartment.Services
         public async Task<List<User>> GetFriends(long userId) =>
             await (
                 from f in _context.Friends
-                where f.SenderUserId == userId || f.TargetUserId == userId
+                where (f.SenderUserId == userId || f.TargetUserId == userId) && f.Status == Status.Accepted
                 select f.SenderUserId == userId ? f.TargetUser : f.SenderUser
             ).ToListAsync();
     }

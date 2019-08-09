@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TreasuryDepartment.Models;
+using TreasuryDepartment.Models.Enums;
 using TreasuryDepartment.Models.RequestModels;
 using TreasuryDepartment.Services;
 using TreasuryDepartment.Services.OfferService;
@@ -14,10 +15,10 @@ namespace TreasuryDepartment.Controllers
     public class FriendsController : Controller
     {
         private readonly UserService _userService;
-        private readonly OfferCrudService<FriendInvite> _friendCrudService;
+        private readonly OfferCrudWithUpdateService<FriendInvite> _friendCrudService;
         private readonly FriendService _friendService;
 
-        public FriendsController(UserService userService, OfferCrudService<FriendInvite> friendCrudService,
+        public FriendsController(UserService userService, OfferCrudWithUpdateService<FriendInvite> friendCrudService,
             FriendService friendService)
         {
             _userService = userService;
@@ -38,7 +39,7 @@ namespace TreasuryDepartment.Controllers
             if (user == null)
                 return NotFound();
 
-            return await _friendService.GetFriends(user.Id); //TODO: Fix bug with wrong status
+            return await _friendService.GetFriends(user.Id);
         }
 
 
@@ -72,7 +73,7 @@ namespace TreasuryDepartment.Controllers
         /// <summary>
         /// Create friend's invite
         /// </summary>
-        /// <param name="offer"></param>
+        /// <param name="requestUsersOffer"></param>
         /// <returns>New friend's invite</returns>
         [HttpPost]
         public async Task<ActionResult<FriendInvite>> Post([FromQuery] RequestUsersOffer requestUsersOffer)
@@ -105,6 +106,9 @@ namespace TreasuryDepartment.Controllers
             var invite = await _friendCrudService.Get(requestUsersOffer);
             if (invite == null)
                 return NotFound();
+
+            if (invite.Status != Status.Pending)
+                return BadRequest();
 
             await changeStatusDelegate(invite);
             return NoContent();

@@ -1,8 +1,10 @@
-﻿using System;
-using TreasuryDepartment.Services;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using TreasuryDepartment.Models;
 using Microsoft.AspNetCore.Mvc;
+using TreasuryDepartment.Models;
+using TreasuryDepartment.Services;
+using TreasuryDepartment.Services.OfferService;
+using TreasuryDepartment.Services.Utils;
 
 namespace TreasuryDepartment.Controllers
 {
@@ -11,10 +13,12 @@ namespace TreasuryDepartment.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly OfferCrudService<Balance> _balanceService;
 
-        public UsersController(UserService service)
+        public UsersController(UserService service, OfferCrudService<Balance> balanceService)
         {
             _userService = service;
+            _balanceService = balanceService;
         }
 
         [HttpGet]
@@ -24,11 +28,20 @@ namespace TreasuryDepartment.Controllers
             if (user == null)
                 NotFound();
 
-            return user; // TODO: Add balances
+            (ICollection<Balance> outcomeBalances, ICollection<Balance> incomeBalances) = await TaskWrapper
+                .WhenAll(_balanceService.GetSentOffers(id),
+                    _balanceService.GetReceivedOffers(id));
+
+            return new OkObjectResult(new
+            {
+                User = user,
+                IncomeBalances = incomeBalances,
+                OutcomeBalance = outcomeBalances
+            });
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> Post(User user) //TODO: Replace User with UserRequestModel
+        public async Task<ActionResult<User>> Post(User user)
         {
             return CreatedAtAction(nameof(Get), new {Id = user.Id}, await _userService.Create(user));
         }

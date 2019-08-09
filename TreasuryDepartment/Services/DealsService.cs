@@ -1,44 +1,31 @@
 using System.Threading.Tasks;
 using TreasuryDepartment.Models;
-using TreasuryDepartment.Models.RequestModels;
 using TreasuryDepartment.Services.OfferService;
 
 namespace TreasuryDepartment.Services
 {
-    public class DealsService
+    public class DealsService : OfferCrudWithUpdateService<Deal>
     {
-        private readonly TreasuryDepartmentContext _context;
-        private readonly OfferCrudService<Deal> _dealsService;
+        private readonly OfferCrudService<Balance> _balanceService;
 
-        public DealsService(TreasuryDepartmentContext context, OfferCrudService<Deal> dealsService)
+        public DealsService(TreasuryDepartmentContext context) : base(context)
         {
-            _context = context;
-            _dealsService = dealsService;
+            _balanceService = new OfferCrudService<Balance>(_context);
         }
 
-        private async Task<Balance> Get(RequestUsersOffer requestUsersOffer) =>
-            await _context.Balances.FindAsync(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
-
-        private async Task<Balance> Create(Balance balance)
+        public new async Task Accept(Deal deal)
         {
-            _context.Balances.Add(balance);
-            await _context.SaveChangesAsync();
-            return balance;
-        }
-
-        public async Task Accept(Deal deal)
-        {
-            await _dealsService.Accept(deal);
+            await base.Accept(deal);
             var senderBalance = new Balance(deal, -deal.Sum);
-            senderBalance = await Get(senderBalance) ??
-                            await Create(senderBalance);
+            senderBalance = await _balanceService.Get(senderBalance) ??
+                            await _balanceService.Create(senderBalance);
             var reverseOffer = new Offer(deal);
             var tmpId = reverseOffer.TargetUserId;
             reverseOffer.TargetUserId = reverseOffer.SenderUserId;
             reverseOffer.SenderUserId = tmpId;
             var targetBalance = new Balance(reverseOffer, deal.Sum);
-            targetBalance = await Get(targetBalance) ??
-                            await Create(targetBalance);
+            targetBalance = await _balanceService.Get(targetBalance) ??
+                            await _balanceService.Create(targetBalance);
         }
     }
 }

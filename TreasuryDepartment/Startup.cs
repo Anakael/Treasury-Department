@@ -37,8 +37,9 @@ namespace TreasuryDepartment
             services.AddDbContext<TreasuryDepartmentContext>(options =>
                 options.UseSqlServer(builder.ConnectionString));
 
-            services.AddScoped<OfferCrudService<FriendInvite>>();
-            services.AddScoped<OfferCrudService<Deal>>();
+            services.AddScoped<OfferCrudService<Balance>>();
+            services.AddScoped<OfferCrudWithUpdateService<FriendInvite>>();
+            services.AddScoped<OfferCrudWithUpdateService<Deal>>();
             services.AddScoped<FriendService>();
             services.AddScoped<DealsService>();
             services.AddScoped<UserService>();
