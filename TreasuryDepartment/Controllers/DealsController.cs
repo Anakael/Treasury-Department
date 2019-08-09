@@ -19,6 +19,23 @@ namespace TreasuryDepartment.Controllers
         private readonly DealsService _dealsService;
         private readonly OfferCrudService<FriendInvite> _friendsCrudService;
 
+        private async Task<ActionResult> Validate(RequestUsersOffer requestUsersOffer)
+        {
+            var fromUser = await _userService.Get(requestUsersOffer.SenderUserId);
+            if (fromUser == null)
+                return NotFound();
+            var toUser = await _userService.Get(requestUsersOffer.TargetUserId);
+            if (toUser == null)
+                return NotFound();
+
+            var friends = new FriendInvite(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
+            var alreadyFriends = await _friendsCrudService.Get(friends);
+            if (alreadyFriends == null)
+                return Forbid();
+
+            return Ok();
+        }
+
         public DealsController(UserService userService, OfferCrudService<Deal> dealsCrudService,
             OfferCrudService<FriendInvite> friendsCrudService, DealsService dealsService)
         {
@@ -29,8 +46,8 @@ namespace TreasuryDepartment.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Deal>> Get([FromQuery] RequestUsersOffer offer) =>
-            await _dealsCrudService.Get(offer);
+        public async Task<ActionResult<Deal>> Get([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await _dealsCrudService.Get(requestUsersOffer);
 
         [HttpGet("[action]")]
         public async Task<ActionResult<List<Deal>>> GetSent(long id) =>
@@ -60,44 +77,30 @@ namespace TreasuryDepartment.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<Deal>> Post([FromQuery] RequestUsersOffer offer, [FromBody] decimal sum)
+        public async Task<ActionResult<Deal>> Post([FromQuery] RequestUsersOffer requestUsersOffer,
+            [FromBody] decimal sum)
         {
-            var fromUser = await _userService.Get(offer.SenderUserId);
-            if (fromUser == null)
-                return NotFound();
-            var toUser = await _userService.Get(offer.TargetUserId);
-            if (toUser == null)
-                return NotFound();
+            var validateResult = await Validate(requestUsersOffer);
+            if (!(validateResult is OkResult))
+                return validateResult;
 
-            var friends = new FriendInvite(offer.SenderUserId, offer.TargetUserId);
-            var alreadyFriends = await _friendsCrudService.Get(friends);
-            if (alreadyFriends == null)
-                return Forbid();
-
-            var deal = new Deal(new Offer(offer), sum);
+            var deal = new Deal(new Offer(requestUsersOffer), sum);
 
             await _dealsCrudService.Create(deal);
-            return CreatedAtAction(nameof(UsersController.Get), new {offer = offer}, deal
+            return CreatedAtAction(nameof(UsersController.Get), new {offer = requestUsersOffer}, deal
             );
         }
 
         private delegate Task ChangeStatusDelegate<in T>(T invite);
 
-        private async Task<ActionResult> Change(RequestUsersOffer usersOffer,
+        private async Task<ActionResult> Change(RequestUsersOffer requestUsersOffer,
             ChangeStatusDelegate<Deal> changeStatusDelegate)
         {
-            var fromUser = await _userService.Get(usersOffer.TargetUserId);
-            if (fromUser == null)
-                return NotFound();
-            var toUser = await _userService.Get(usersOffer.TargetUserId);
-            if (toUser == null)
-                return NotFound();
-            var friends = new FriendInvite(usersOffer.SenderUserId, usersOffer.TargetUserId);
-            var alreadyFriends = await _friendsCrudService.Get(friends);
-            if (alreadyFriends == null)
-                return Forbid();
+            var validateResult = await Validate(requestUsersOffer);
+            if (!(validateResult is OkResult))
+                return validateResult;
 
-            var deal = await _dealsCrudService.Get(usersOffer);
+            var deal = await _dealsCrudService.Get(requestUsersOffer);
 
             if (deal.Status != Status.Pending)
                 return BadRequest();
@@ -107,15 +110,15 @@ namespace TreasuryDepartment.Controllers
         }
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _dealsService.Accept);
+        public async Task<ActionResult> Accept([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _dealsService.Accept);
 
         [HttpPost("[action]")]
-        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _dealsCrudService.Decline);
+        public async Task<ActionResult> Decline([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _dealsCrudService.Decline);
 
         [HttpDelete]
-        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer offer) =>
-            await Change(offer, _dealsCrudService.Delete);
+        public async Task<ActionResult> Delete([FromQuery] RequestUsersOffer requestUsersOffer) =>
+            await Change(requestUsersOffer, _dealsCrudService.Delete);
     }
 }
