@@ -1,31 +1,26 @@
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Services.OfferService;
 
 namespace TreasuryDepartment.Services
 {
-    public class DealsService : OfferCrudWithUpdateService<Deal>
+    public class DealsService : OfferCrudService<Deal>
     {
-        private readonly OfferCrudService<Balance> _balanceService;
+        private readonly OfferCrudService<FriendInvite> _friendService;
 
         public DealsService(TreasuryDepartmentContext context) : base(context)
         {
-            _balanceService = new OfferCrudService<Balance>(_context);
+            _friendService = new OfferCrudService<FriendInvite>(_context);
         }
 
         public new async Task Accept(Deal deal)
         {
             await base.Accept(deal);
-            var senderBalance = new Balance(deal, -deal.Sum);
-            senderBalance = await _balanceService.Get(senderBalance) ??
-                            await _balanceService.Create(senderBalance);
-            var reverseOffer = new Offer(deal);
-            var tmpId = reverseOffer.TargetUserId;
-            reverseOffer.TargetUserId = reverseOffer.SenderUserId;
-            reverseOffer.SenderUserId = tmpId;
-            var targetBalance = new Balance(reverseOffer, deal.Sum);
-            targetBalance = await _balanceService.Get(targetBalance) ??
-                            await _balanceService.Create(targetBalance);
+            var friends = await _friendService.Get(new FriendInvite(deal.SenderUserId, deal.TargetUserId));
+            friends.Sum -= deal.Sum;
+            _context.Entry(friends).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

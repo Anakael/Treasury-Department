@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Models.Enums;
 using TreasuryDepartment.Models.RequestModels;
+using TreasuryDepartment.Models.ResponseModels;
 using TreasuryDepartment.Services;
-using TreasuryDepartment.Services.OfferService;
 
 namespace TreasuryDepartment.Controllers
 {
@@ -16,15 +17,15 @@ namespace TreasuryDepartment.Controllers
     {
         private readonly UserService _userService;
         private readonly DealsService _dealsService;
-        private readonly OfferCrudWithUpdateService<FriendInvite> _friendsCrudService;
+        private readonly FriendService _friendsService;
 
         public DealsController(UserService userService, DealsService dealsService,
-            OfferCrudWithUpdateService<FriendInvite> friendsCrudService
+            FriendService friendsService
         )
 
         {
             _userService = userService;
-            _friendsCrudService = friendsCrudService;
+            _friendsService = friendsService;
             _dealsService = dealsService;
         }
 
@@ -38,8 +39,8 @@ namespace TreasuryDepartment.Controllers
                 return NotFound();
 
             var friends = new FriendInvite(requestUsersOffer.SenderUserId, requestUsersOffer.TargetUserId);
-            var alreadyFriends = await _friendsCrudService.Get(friends);
-            if (alreadyFriends == null)
+            var alreadyFriends = await _friendsService.Get(friends);
+            if (alreadyFriends == null || alreadyFriends.Status != Status.Accepted)
                 return BadRequest();
 
             return Ok();
@@ -57,25 +58,30 @@ namespace TreasuryDepartment.Controllers
 
 
         [HttpGet("[action]")]
-        public async Task<ActionResult<List<Deal>>> GetSent(long id) =>
+        public async Task<ActionResult<List<DealResponse>>> GetSent(long id) =>
             await GetDealsByType(id, _dealsService.GetSentOffers);
 
         [HttpGet("[action]")]
-        public async Task<ActionResult<List<Deal>>> GetReceived(long id) =>
+        public async Task<ActionResult<List<DealResponse>>> GetReceived(long id) =>
             await GetDealsByType(id, _dealsService.GetReceivedOffers);
 
 
         private delegate Task<List<Deal>> GetDealsDelegate(long id);
 
 
-        private async Task<ActionResult<List<Deal>>> GetDealsByType(long id, GetDealsDelegate getInvitesDelegate)
+        private async Task<ActionResult<List<DealResponse>>> GetDealsByType(long id,
+            GetDealsDelegate getInvitesDelegate)
         {
             var user = await _userService.Get(id);
             if (user == null)
                 return NotFound();
 
             var deals = await getInvitesDelegate(user.Id);
-            return deals;
+            return deals.Select(d =>
+                new DealResponse(d,
+                    getInvitesDelegate == _dealsService.GetReceivedOffers
+                        ? ChooseFriendUserChoice.Sender
+                        : ChooseFriendUserChoice.Target)).ToList();
         }
 
 
@@ -90,7 +96,12 @@ namespace TreasuryDepartment.Controllers
             if (sum < 0)
                 return BadRequest();
 
-            var deal = new Deal(new Offer(requestUsersOffer), sum);
+            var deal = new Deal
+            {
+                SenderUserId = requestUsersOffer.SenderUserId,
+                TargetUserId = requestUsersOffer.TargetUserId,
+                Sum = sum
+            };
 
             await _dealsService.Create(deal);
             return CreatedAtAction(nameof(UsersController.Get), new {offer = requestUsersOffer}, deal
@@ -108,7 +119,7 @@ namespace TreasuryDepartment.Controllers
 
             var deal = await _dealsService.Get(requestUsersOffer);
 
-            if (deal.Status != Status.Pending)
+            if (deal == null || deal.Status != Status.Pending)
                 return BadRequest();
 
             deal.LastStatusChangeDate = DateTime.Now;

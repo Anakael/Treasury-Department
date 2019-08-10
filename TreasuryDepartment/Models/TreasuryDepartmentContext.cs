@@ -10,7 +10,6 @@ namespace TreasuryDepartment.Models
             Database.EnsureCreated();
         }
 
-        public DbSet<Balance> Balances { get; set; }
         public DbSet<BlackList> BlackLists { get; set; }
         public DbSet<Deal> Deals { get; set; }
         public DbSet<FriendInvite> Friends { get; set; }
@@ -18,20 +17,6 @@ namespace TreasuryDepartment.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Balance>(entity =>
-            {
-                entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});
-
-                entity.HasOne(d => d.SenderUser)
-                    .WithMany()
-                    .HasForeignKey(ug => ug.SenderUserId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(d => d.TargetUser)
-                    .WithMany()
-                    .HasForeignKey(ug => ug.TargetUserId);
-            });
-
             modelBuilder.Entity<BlackList>(entity =>
             {
                 entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});
@@ -42,20 +27,6 @@ namespace TreasuryDepartment.Models
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(bl => bl.TargetUser)
-                    .WithMany()
-                    .HasForeignKey(ug => ug.TargetUserId);
-            });
-
-            modelBuilder.Entity<Balance>(entity =>
-            {
-                entity.HasKey(t => new {t.SenderUserId, t.TargetUserId});
-
-                entity.HasOne(d => d.SenderUser)
-                    .WithMany()
-                    .HasForeignKey(ug => ug.SenderUserId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(d => d.TargetUser)
                     .WithMany()
                     .HasForeignKey(ug => ug.TargetUserId);
             });

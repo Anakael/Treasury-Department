@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using TreasuryDepartment.Models;
+using TreasuryDepartment.Models.ResponseModels;
 using TreasuryDepartment.Services;
 using TreasuryDepartment.Services.OfferService;
 using TreasuryDepartment.Services.Utils;
@@ -13,12 +15,12 @@ namespace TreasuryDepartment.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
-        private readonly OfferCrudService<Balance> _balanceService;
+        private readonly FriendService _friendService;
 
-        public UsersController(UserService service, OfferCrudService<Balance> balanceService)
+        public UsersController(UserService service, FriendService friendService)
         {
             _userService = service;
-            _balanceService = balanceService;
+            _friendService = friendService;
         }
 
         [HttpGet]
@@ -28,15 +30,15 @@ namespace TreasuryDepartment.Controllers
             if (user == null)
                 NotFound();
 
-            (ICollection<Balance> outcomeBalances, ICollection<Balance> incomeBalances) = await TaskWrapper
-                .WhenAll(_balanceService.GetSentOffers(id),
-                    _balanceService.GetReceivedOffers(id));
+            (ICollection<FriendInvite> outcomeBalances, ICollection<FriendInvite> incomeBalances) = await TaskWrapper
+                .WhenAll(_friendService.GetSentOffers(id),
+                    _friendService.GetReceivedOffers(id));
 
             return new OkObjectResult(new
             {
                 User = user,
-                IncomeBalances = incomeBalances,
-                OutcomeBalance = outcomeBalances
+                IncomeBalances = incomeBalances.Select(b => new FriendBalance(b, ChooseFriendUserChoice.Sender)),
+                OutcomeBalance = outcomeBalances.Select(b => new FriendBalance(b, ChooseFriendUserChoice.Target))
             });
         }
 

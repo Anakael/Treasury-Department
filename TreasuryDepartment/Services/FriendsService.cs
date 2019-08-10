@@ -4,16 +4,14 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Models.Enums;
+using TreasuryDepartment.Services.OfferService;
 
 namespace TreasuryDepartment.Services
 {
-    public class FriendService
+    public class FriendService : OfferCrudService<FriendInvite>
     {
-        private readonly TreasuryDepartmentContext _context;
-
-        public FriendService(TreasuryDepartmentContext context)
+        public FriendService(TreasuryDepartmentContext context) : base(context)
         {
-            _context = context;
         }
 
         public async Task<List<User>> GetFriends(long userId) =>

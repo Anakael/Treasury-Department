@@ -3,12 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TreasuryDepartment.Models;
+using TreasuryDepartment.Models.Enums;
 using TreasuryDepartment.Models.RequestModels;
 
 namespace TreasuryDepartment.Services.OfferService
 {
     public class OfferCrudService<TClassname>
-        where TClassname : UsersOffer
+        where TClassname : Offer
     {
         protected readonly TreasuryDepartmentContext _context;
         protected readonly DbSet<TClassname> _dbSet;
@@ -50,6 +51,27 @@ namespace TreasuryDepartment.Services.OfferService
             _dbSet.Add(offer);
             await _context.SaveChangesAsync();
             return offer;
+        }
+
+        private async Task ChangeStatus(TClassname offer, Status newStatus)
+        {
+            offer.Status = newStatus;
+            _context.Entry(offer).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Accept(TClassname offer) =>
+            await ChangeStatus(offer, Status.Accepted);
+
+
+        public async Task Decline(TClassname offer) =>
+            await ChangeStatus(offer, Status.Declined);
+
+
+        public async Task Delete(TClassname offer)
+        {
+            _dbSet.Remove(offer);
+            await _context.SaveChangesAsync();
         }
     }
 }

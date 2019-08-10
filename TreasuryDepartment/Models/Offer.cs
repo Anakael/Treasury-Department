@@ -6,20 +6,17 @@ namespace TreasuryDepartment.Models
     public class Offer : UsersOffer
     {
         public Status Status { get; set; } = Status.Pending;
+        public decimal Sum { get; set; }
 
         protected Offer()
         {
         }
 
-        public Offer(RequestUsersOffer offer)
+        public Offer(RequestUsersOffer offer, decimal sum)
         {
             SenderUserId = offer.SenderUserId;
             TargetUserId = offer.TargetUserId;
-        }
-
-        public Offer(Offer other) : base(other)
-        {
-            Status = other.Status;
+            Sum = sum;
         }
     }
 }
