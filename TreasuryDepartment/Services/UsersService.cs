@@ -1,7 +1,5 @@
-using TreasuryDepartment.Models;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using TreasuryDepartment.Models;
 
 namespace TreasuryDepartment.Services
 {

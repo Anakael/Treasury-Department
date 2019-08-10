@@ -1,8 +1,12 @@
-﻿using System;
-using TreasuryDepartment.Services;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using TreasuryDepartment.Models;
 using Microsoft.AspNetCore.Mvc;
+using TreasuryDepartment.Models;
+using TreasuryDepartment.Models.ResponseModels;
+using TreasuryDepartment.Services;
+using TreasuryDepartment.Services.OfferService;
+using TreasuryDepartment.Services.Utils;
 
 namespace TreasuryDepartment.Controllers
 {
@@ -11,10 +15,12 @@ namespace TreasuryDepartment.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly FriendService _friendService;
 
-        public UsersController(UserService service)
+        public UsersController(UserService service, FriendService friendService)
         {
             _userService = service;
+            _friendService = friendService;
         }
 
         [HttpGet]
@@ -24,7 +30,16 @@ namespace TreasuryDepartment.Controllers
             if (user == null)
                 NotFound();
 
-            return user; // TODO: Add balances
+            (ICollection<FriendInvite> outcomeBalances, ICollection<FriendInvite> incomeBalances) = await TaskWrapper
+                .WhenAll(_friendService.GetSentOffers(id),
+                    _friendService.GetReceivedOffers(id));
+
+            return new OkObjectResult(new
+            {
+                User = user,
+                IncomeBalances = incomeBalances.Select(b => new FriendBalance(b, ChooseFriendUserChoice.Sender)),
+                OutcomeBalance = outcomeBalances.Select(b => new FriendBalance(b, ChooseFriendUserChoice.Target))
+            });
         }
 
         [HttpPost]

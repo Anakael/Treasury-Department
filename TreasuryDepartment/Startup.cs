@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using TreasuryDepartment.Models;
 using TreasuryDepartment.Services;
 using TreasuryDepartment.Services.OfferService;
+using Microsoft.OpenApi.Models;
 
 namespace TreasuryDepartment
 {
@@ -38,11 +39,19 @@ namespace TreasuryDepartment
 
             services.AddScoped<OfferCrudService<FriendInvite>>();
             services.AddScoped<OfferCrudService<Deal>>();
-            services.AddScoped<OfferCrudService<Balance>>();
             services.AddScoped<FriendService>();
+            services.AddScoped<DealsService>();
             services.AddScoped<UserService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Treasure-Department API"
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,6 +69,8 @@ namespace TreasuryDepartment
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Treasure-Department API"); });
         }
     }
 }
