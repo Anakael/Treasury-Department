@@ -17,7 +17,7 @@ namespace TreasureDepartment.Logic.Friends.Services
 
         public async Task<List<UserDbo>> GetFriends(long userId) =>
             await (
-                from f in Context.Friends
+                from f in _context.Friends
                 where (f.SenderUserId == userId || f.TargetUserId == userId) && f.Status == Status.Accepted
                 select f.SenderUserId == userId ? f.TargetUser : f.SenderUser
             ).ToListAsync();

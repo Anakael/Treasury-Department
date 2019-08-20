@@ -13,7 +13,7 @@ namespace TreasureDepartment.Logic.Deals.Services
 
         public DealsService(TreasuryDepartmentContext context) : base(context)
         {
-            _friendService = new OfferCrudService<FriendInviteDbo>(Context);
+            _friendService = new OfferCrudService<FriendInviteDbo>(_context);
         }
 
         public new async Task Accept(DealDbo dealDbo)
@@ -25,8 +25,8 @@ namespace TreasureDepartment.Logic.Deals.Services
                 TargetUserId = dealDbo.TargetUserId
             });
             friends.Sum -= dealDbo.Sum;
-            Context.Entry(friends).State = EntityState.Modified;
-            await Context.SaveChangesAsync();
+            _context.Entry(friends).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
     }
 }

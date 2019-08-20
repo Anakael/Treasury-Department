@@ -12,7 +12,7 @@ namespace TreasureDepartment.Logic.OfferCrud.Services
     public class OfferCrudService<TClassname>
         where TClassname : UsersOfferDbo
     {
-        protected readonly TreasuryDepartmentContext Context;
+        protected readonly TreasuryDepartmentContext _context;
         private readonly DbSet<TClassname> _dbSet;
 
         protected OfferCrudService()
@@ -21,8 +21,8 @@ namespace TreasureDepartment.Logic.OfferCrud.Services
 
         public OfferCrudService(TreasuryDepartmentContext context)
         {
-            Context = context;
-            _dbSet = Context.Set<TClassname>();
+            _context = context;
+            _dbSet = _context.Set<TClassname>();
         }
 
         public async Task<TClassname> Get(UsersOfferRequest usersOfferRequest) =>
@@ -50,15 +50,15 @@ namespace TreasureDepartment.Logic.OfferCrud.Services
         public async Task<TClassname> Create(TClassname offer)
         {
             _dbSet.Add(offer);
-            await Context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return offer;
         }
 
         private async Task ChangeStatus(TClassname offer, Status newStatus)
         {
             offer.Status = newStatus;
-            Context.Entry(offer).State = EntityState.Modified;
-            await Context.SaveChangesAsync();
+            _context.Entry(offer).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
         }
 
         public async Task Accept(TClassname offer) =>
@@ -72,7 +72,7 @@ namespace TreasureDepartment.Logic.OfferCrud.Services
         public async Task Delete(TClassname offer)
         {
             _dbSet.Remove(offer);
-            await Context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
     }
 }
