@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,14 +41,7 @@ namespace TreasureDepartment.Web
                 options.UseSqlServer(Configuration.GetConnectionString("TreasuryDepartment")));
 
 
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new UserProfile());
-                mc.AddProfile(new UserResponseProfile());
-            });
-
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             services.AddScoped<OfferCrudService<FriendInviteDbo>>();
             services.AddScoped<OfferCrudService<DealDbo>>();
             services.AddScoped<FriendService>();
