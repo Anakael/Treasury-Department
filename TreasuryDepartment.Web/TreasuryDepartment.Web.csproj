@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <RootNamespace>TreasureDepartment.Web</RootNamespace>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="appsettings.Development.json">
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="appsettings.json">
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Include="Properties\launchSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.App" />
+      <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TreasuryDepartment.Logic\TreasuryDepartment.Logic.csproj" />
+    </ItemGroup>
+
+</Project>
