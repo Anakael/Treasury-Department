@@ -1,21 +1,23 @@
 import React, {Component, ReactNode} from 'react';
-import {Field, Form} from "react-final-form";
+import {Field, Form, FormRenderProps} from "react-final-form";
 import {TextField} from 'final-form-material-ui';
 import {Button} from "@material-ui/core";
+import {connect} from "react-redux";
+import {store} from "../../../store/treasuryDepartmentStore";
+import {LOGIN_REQUEST} from "../../../store/login/actions/actionTypes";
 
 interface LoginState {
 	login: string;
 	password: string;
 }
 
-export class Login extends Component<{}, LoginState> {
+class LoginComponent extends Component<{}, LoginState> {
 	render(): ReactNode {
 		return (
 			<div>
 				<Form
-					onSubmit={(values) => console.log(values)}
-					initialValues={{login: '', password: ''}}
-					render={({handleSubmit, form, submitting, pristine, values}) => (
+					onSubmit={(values: FormRenderProps<LoginState>) => store.dispatch({ type: LOGIN_REQUEST})}
+					render={({handleSubmit}) => (
 						<form onSubmit={handleSubmit}>
 							<div>
 								<Field
@@ -41,3 +43,15 @@ export class Login extends Component<{}, LoginState> {
 		);
 	}
 }
+
+const mapStateToProps = (state: LoginState) => ({
+});
+
+const dispatchProps = {
+
+};
+
+export const Login = connect(
+	mapStateToProps,
+	dispatchProps
+)(LoginComponent);
