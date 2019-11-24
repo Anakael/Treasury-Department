@@ -3,6 +3,8 @@ import {loginReducer} from "./login/reducers/loginReducer";
 
 export const rootReducer = combineReducers(
 	{
-		login: loginReducer,
+		auth: loginReducer,
 	}
 );
+
+export type RootState = ReturnType<typeof rootReducer>

@@ -1,23 +1,39 @@
-import {ActionType, createReducer} from "typesafe-actions";
+import {ActionType} from "typesafe-actions";
 import {User} from "../../../models/user";
 import * as loginActions from "../actions/loginActions";
 import {LOGIN_REQUEST} from "../actions/actionTypes";
+import Cookies from 'js-cookie'
 
 
-export type LoginState = Readonly<{
+export type AuthState = Readonly<{
 	user: User;
 	token: string;
+	loginError: string;
 }>;
 
-const initialState: LoginState = {
+export const authInitialState: AuthState = {
 	user: {},
-	token: '',
+	token: Cookies.get('token') || '',
+	loginError: ''
 };
 
 export type LoginAction = ActionType<typeof loginActions>;
 
-export const loginReducer = createReducer(initialState)
-	.handleAction(LOGIN_REQUEST, (state: LoginState, action: LoginAction) => {
-		console.log('LOL');
-		return state;
-	} );
+export function loginReducer(
+	state = authInitialState,
+	action: LoginAction
+): AuthState {
+	switch (action.type) {
+		case LOGIN_REQUEST: {
+			console.log(Cookies.get('token'));
+			const token = 'lol';
+			Cookies.set('token', token);
+			return {
+				...state,
+				token: token,
+			};
+		}
+		default:
+			return state
+	}
+}

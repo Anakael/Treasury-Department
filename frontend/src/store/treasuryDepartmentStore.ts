@@ -1,15 +1,6 @@
 import {createStore} from "redux";
 import {rootReducer} from "./rootReducer";
-
-export interface TreasuryDepartmentStore {
-	auth: {
-		token: string;
-		authenticated: boolean;
-		user?: string;
-	}
-}
-
-export const initialStoreState = {};
+import {devToolsEnhancer} from "redux-devtools-extension";
 
 
-export const store = createStore(rootReducer, initialStoreState);
+export const store = createStore(rootReducer, devToolsEnhancer({}));
