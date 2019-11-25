@@ -1,19 +1,20 @@
 import {ActionType} from "typesafe-actions";
-import {User} from "../../../models/user";
+import {User} from "../../../models/login/User";
 import * as loginActions from "../actions/loginActions";
-import {LOGIN_REQUEST} from "../actions/actionTypes";
+import {LOGIN_FAILURE, LOGIN_SUCCESS} from "../actions/actionTypes";
 import Cookies from 'js-cookie'
+import {Token} from "../../../models/login/Token";
 
 
 export type AuthState = Readonly<{
-	user: User;
-	token: string;
+	user?: User;
+	token?: Token;
 	loginError: string;
 }>;
 
 export const authInitialState: AuthState = {
-	user: {},
-	token: Cookies.get('token') || '',
+	user: (Cookies.get('user') && JSON.parse(Cookies.get('user'))) || '',
+	token: (Cookies.get('token') && JSON.parse(Cookies.get('token'))) || '',
 	loginError: ''
 };
 
@@ -24,13 +25,27 @@ export function loginReducer(
 	action: LoginAction
 ): AuthState {
 	switch (action.type) {
-		case LOGIN_REQUEST: {
-			console.log(Cookies.get('token'));
-			const token = 'lol';
+		case LOGIN_SUCCESS: {
+			const payload = action.payload;
+			const token = payload.token;
+			const user = payload.user;
+			Cookies.set('user', user);
 			Cookies.set('token', token);
 			return {
 				...state,
+				loginError: '',
+				user: user,
 				token: token,
+			};
+		}
+		case LOGIN_FAILURE: {
+			Cookies.remove('user');
+			Cookies.remove('token');
+			return {
+				...state,
+				user: undefined,
+				token: undefined,
+				loginError: action.payload,
 			};
 		}
 		default:

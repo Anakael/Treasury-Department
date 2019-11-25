@@ -1,14 +1,22 @@
-import {takeEvery} from 'redux-saga/effects';
-import {LOGIN_REQUEST} from "../actions/actionTypes";
+import {call, put, takeLatest} from 'redux-saga/effects';
+import {loginRequest} from "../../../services/loginService";
+import {logIn, logInFailure, logInSuccess} from "../actions/loginActions";
 
-export function* login() {
-	console.log('LOGIN SIDE');
-	yield ''
+export function* login(logIn) {
+	const credentials = logIn.payload;
+	try {
+		const response = yield call(loginRequest, credentials.login, credentials.password);
+		const data = response.data;
+		console.log(data);
+		yield put(logInSuccess(data))
+	} catch (error) {
+		yield put(logInFailure(error.response.data))
+	}
 }
 
 export function* watchLogin() {
-	yield takeEvery(
-		LOGIN_REQUEST,
-		login
+	yield takeLatest(
+		logIn,
+		login,
 	);
 }

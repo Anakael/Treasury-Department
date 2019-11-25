@@ -18,7 +18,7 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	logIn: (login: string, password: string) => dispatch(logIn(login, password))
+	logIn: (login: string, password: string) => dispatch(logIn({login: login, password: password}))
 });
 
 const connector = connect(
@@ -30,10 +30,10 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 
 type LoginProps = PropsFromRedux
 
-class LoginComponent extends Component<LoginProps, LoginState> {
+class Login extends Component<LoginProps, LoginState> {
 	render(): ReactNode {
 		return (
-			this.props.auth.token !== ''
+			!!this.props.auth.token
 				? <Redirect to="/"/>
 				: <div>
 					<Form
@@ -66,4 +66,4 @@ class LoginComponent extends Component<LoginProps, LoginState> {
 	}
 }
 
-export const Login = connector(LoginComponent);
+export default connector(Login);

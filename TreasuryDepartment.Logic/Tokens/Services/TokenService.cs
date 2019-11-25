@@ -30,17 +30,17 @@ namespace TreasureDepartment.Logic.Tokens.Services
         {
             var now = DateTime.UtcNow;
             var jwt = new JwtSecurityToken(
-                issuer: _jwtOptions.Issuer,
-                audience: _jwtOptions.Audience,
-                claims: claims,
-                notBefore: now,
-                expires: now.AddMinutes(_jwtOptions.LifeTime),
-                signingCredentials: new SigningCredentials(_jwtOptions.GetSymmetricSecurityKey(),
+                _jwtOptions.Issuer,
+                _jwtOptions.Audience,
+                claims,
+                now,
+                now.AddMinutes(_jwtOptions.LifeTime),
+                new SigningCredentials(_jwtOptions.GetSymmetricSecurityKey(),
                     SecurityAlgorithms.HmacSha256));
             return new AccessToken
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(jwt),
-                ExpiresIn = new DateTime(_jwtOptions.LifeTime).Second,
+                ExpiresIn = _jwtOptions.LifeTime,
                 RefreshToken = GenerateRefreshToken()
             };
         }

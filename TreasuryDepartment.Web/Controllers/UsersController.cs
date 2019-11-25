@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -63,12 +64,13 @@ namespace TreasureDepartment.Web.Controllers
         public async Task<ActionResult<UserAuthorizedResponse>> Authorize([FromForm] string login,
             [FromForm] string password)
         {
+            const string invalidCredentialsMessage = "Invalid credentials"; 
             var user = (await _userService.Find(x => x.Login == login)).SingleOrDefault();
             if (user == null)
-                return BadRequest();
+                return BadRequest(invalidCredentialsMessage);
 
             if (!CryptographyProcessor.Validate(password, user.HashedPassword, user.Salt))
-                return StatusCode((int) HttpStatusCode.Unauthorized);
+                return Unauthorized(invalidCredentialsMessage);
 
             var userClaims = new[]
             {
