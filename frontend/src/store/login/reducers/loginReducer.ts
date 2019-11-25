@@ -7,8 +7,8 @@ import {Token} from "../../../models/login/Token";
 
 
 export type AuthState = Readonly<{
-	user?: User;
-	token?: Token;
+	user: User;
+	token: Token;
 	loginError: string;
 }>;
 
@@ -43,8 +43,8 @@ export function loginReducer(
 			Cookies.remove('token');
 			return {
 				...state,
-				user: undefined,
-				token: undefined,
+				user: authInitialState.user,
+				token: authInitialState.token,
 				loginError: action.payload,
 			};
 		}

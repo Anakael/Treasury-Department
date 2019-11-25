@@ -1,9 +1,9 @@
 import React, {FC} from 'react';
 import {BrowserRouter as Router, Redirect, Route} from 'react-router-dom'
-import {MainPage} from "./main/main_page/MainPage";
 import {RootState} from "./store/rootReducer";
 import {connect, ConnectedProps} from "react-redux";
 import Login from "./main/auth/login/Login";
+import MainPage from "./main/main_page/MainPage";
 
 const mapStateToProps = (state: RootState) => ({
 	isAuthenticated: !!state.auth.token

@@ -15,11 +15,11 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 
 type MainPageProps = PropsFromRedux
 
-export class MainPage extends Component<MainPageProps, {}> {
+class MainPage extends Component<MainPageProps, {}> {
 	render(): ReactNode {
 		return (
 			<div>
-				Hello {this.props.auth}!
+				Hello {this.props.auth.user.login}!
 			</div>
 		)
 	}
