@@ -10,12 +10,14 @@ export type AuthState = Readonly<{
 	user: User;
 	token: Token;
 	loginError: string;
+	signUpError: string;
 }>;
 
 export const authInitialState: AuthState = {
 	user: (Cookies.get('user') && JSON.parse(Cookies.get('user'))) || '',
 	token: (Cookies.get('token') && JSON.parse(Cookies.get('token'))) || '',
-	loginError: ''
+	loginError: '',
+	signUpError: ''
 };
 
 export type LoginAction = ActionType<typeof loginActions>;
@@ -34,6 +36,7 @@ export function loginReducer(
 			return {
 				...state,
 				loginError: '',
+				signUpError: '',
 				user: user,
 				token: token,
 			};

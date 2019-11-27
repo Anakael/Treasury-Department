@@ -7,7 +7,6 @@ export function* login(logIn) {
 	try {
 		const response = yield call(loginRequest, credentials.login, credentials.password);
 		const data = response.data;
-		console.log(data);
 		yield put(logInSuccess(data))
 	} catch (error) {
 		yield put(logInFailure(error.response.data))

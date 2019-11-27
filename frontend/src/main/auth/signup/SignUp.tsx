@@ -1,33 +1,35 @@
 import React, {FC} from 'react';
 import {Button} from "@material-ui/core";
 import {connect, ConnectedProps} from "react-redux";
+import {Dispatch} from "redux";
 import {RootState} from "../../../store/rootReducer";
 import {Link, Redirect} from 'react-router-dom'
-import LoginForm from "./LoginForm";
-
+import SignUpForm from "./SignUpForm";
 
 const mapStateToProps = (state: RootState) => ({
 	auth: state.auth
 });
 
+const mapDispatchToProps = (dispatch: Dispatch) => ({});
+
 const connector = connect(
 	mapStateToProps,
-	{}
+	mapDispatchToProps
 );
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
-type LoginProps = PropsFromRedux
+type SignUpProps = PropsFromRedux
 
-export const Login: FC<LoginProps> = (props) => {
+export const SignUp: FC<SignUpProps> = (props) => {
 	return (
 		!!props.auth.token
 			? <Redirect to="/"/>
 			: <div>
-				<LoginForm/>
-				<Link to={'/signup'}> <Button>Sign up</Button></Link>
+				<SignUpForm/>
+				<Link to={'/login'}> <Button>Log in</Button></Link>
 			</div>
 	);
 };
 
-export default connector(Login);
+export default connector(SignUp);
