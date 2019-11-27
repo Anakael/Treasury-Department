@@ -16,7 +16,7 @@ interface OtherProps {
 }
 
 export const InnerForm = (props: FormikProps<SignUpValues> & OtherProps) => {
-	const {auth} = props;
+	const {errors, auth} = props;
 	return (
 		<Form>
 			<div>
@@ -40,6 +40,7 @@ export const InnerForm = (props: FormikProps<SignUpValues> & OtherProps) => {
 					{({field}) => (
 						<div>
 							<TextField {...field} type="password" placeholder="Confirm password" required/>
+							{errors.confirmPassword && <span>{errors.confirmPassword}</span>}
 						</div>
 					)}
 				</Field>

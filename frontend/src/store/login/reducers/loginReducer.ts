@@ -1,7 +1,7 @@
 import {ActionType} from "typesafe-actions";
 import {User} from "../../../models/login/User";
 import * as loginActions from "../actions/loginActions";
-import {LOGIN_FAILURE, LOGIN_SUCCESS} from "../actions/actionTypes";
+import {LOGIN_FAILURE, LOGIN_SUCCESS, SIGNUP_FAILURE} from "../actions/actionTypes";
 import Cookies from 'js-cookie'
 import {Token} from "../../../models/login/Token";
 
@@ -49,6 +49,16 @@ export function loginReducer(
 				user: authInitialState.user,
 				token: authInitialState.token,
 				loginError: action.payload,
+			};
+		}
+		case SIGNUP_FAILURE: {
+			Cookies.remove('user');
+			Cookies.remove('token');
+			return {
+				...state,
+				user: authInitialState.user,
+				token: authInitialState.token,
+				signUpError: action.payload,
 			};
 		}
 		default:

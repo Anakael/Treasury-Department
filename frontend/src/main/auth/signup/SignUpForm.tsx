@@ -5,7 +5,11 @@ import {signUp} from "../../../store/login/actions/loginActions";
 import {connect, ConnectedProps} from "react-redux";
 import {InnerForm, SignUpValues} from "./SignUpInnerForm";
 import {SignUpRequest} from "../../../models/login/SignUpRequest";
+import * as Yup from 'yup';
 
+const SignUpSchema = Yup.object().shape({
+	confirmPassword: Yup.string().oneOf([Yup.ref('credentials.password'), ''], 'Passwords must match')
+});
 
 const mapStateToProps = (state: RootState) => ({
 	auth: state.auth
@@ -35,9 +39,10 @@ const SignUpForm = withFormik<SignUpProps, SignUpValues>({
 			confirmPassword: ''
 		}
 	},
+	validationSchema: SignUpSchema,
 	handleSubmit: (values, {props}) => {
-		props.signUp(values);
-	},
+		props.signUp({credentials: values.credentials, email: values.email});
+	}
 })(InnerForm);
 
 export default connector(SignUpForm);
