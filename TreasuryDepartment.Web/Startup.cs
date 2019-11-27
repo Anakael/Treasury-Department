@@ -17,9 +17,7 @@ using TreasureDepartment.Logic.Friends.Services;
 using TreasureDepartment.Logic.OfferCrud.Services;
 using TreasureDepartment.Logic.Options;
 using TreasureDepartment.Logic.Tokens.Services;
-using TreasureDepartment.Logic.Users.Profiles;
 using TreasureDepartment.Logic.Users.Services;
-using TreasureDepartment.Web.Users.Profiles;
 
 namespace TreasureDepartment.Web
 {
@@ -48,7 +46,6 @@ namespace TreasureDepartment.Web
             services.AddScoped<DealsService>();
             services.AddScoped<UserService>();
             services.AddScoped<TokenService>();
-
 
             var jwtOptions = new JWTOptions
             {
@@ -103,6 +100,15 @@ namespace TreasureDepartment.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseCors(builder =>
+            {
+                builder
+                    .WithOrigins("https://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
 
             app.UseHttpsRedirection();
             app.UseAuthentication();
