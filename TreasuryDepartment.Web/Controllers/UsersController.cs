@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -64,7 +62,7 @@ namespace TreasureDepartment.Web.Controllers
         public async Task<ActionResult<UserAuthorizedResponse>> Authorize([FromForm] string login,
             [FromForm] string password)
         {
-            const string invalidCredentialsMessage = "Invalid credentials"; 
+            const string invalidCredentialsMessage = "Invalid credentials";
             var user = (await _userService.Find(x => x.Login == login)).SingleOrDefault();
             if (user == null)
                 return BadRequest(invalidCredentialsMessage);
@@ -94,10 +92,13 @@ namespace TreasureDepartment.Web.Controllers
 
         [HttpPost("[action]")]
         public async Task<ActionResult<UserAuthorizedResponse>> Register(
-            [FromBody] UserRegisterRequest userRegisterRequest)
+            [FromForm] UserRegisterRequest userRegisterRequest)
         {
             if ((await _userService.Find(x => x.Login == userRegisterRequest.Login)).Any())
-                return BadRequest();
+                return BadRequest("User with same login already exists");
+
+            if ((await _userService.Find(x => x.Login == userRegisterRequest.Login)).Any())
+                return BadRequest("User with same email already exists");
 
             await _userService.Register(userRegisterRequest);
             return await Authorize(userRegisterRequest.Login, userRegisterRequest.Password);
